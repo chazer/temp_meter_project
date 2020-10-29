@@ -1,4 +1,19 @@
 version: "3.7"
 
 services:
-  tempser:
+  server:
+    build:
+      context: .
+      dockerfile: docker/tmeter/Dockerfile
+    ports:
+      - 8080
+    environment:
+      JSON_INDENT_RESPONSES: "yes"
+
+  cli:
+    build:
+      context: .
+      dockerfile: docker/cli/Dockerfile
+    environment:
+      API_URI: server:8080
+
