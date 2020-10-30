@@ -61,6 +61,9 @@ func (s *jsonErrorsWrapperWriter) WriteHeader(statusCode int) {
 func (s *jsonErrorsWrapperWriter) Close() {
 	if s.convertErrorMessageToJson {
 		errorMessage := strings.TrimSpace(s.buf.String())
+		if errorMessage == "" {
+			errorMessage = http.StatusText(s.GetStatusCode())
+		}
 		debug.Printf("<<< Error %d %s", s.GetStatusCode(), errorMessage)
 		if doc, err := helpers.ErrorToJSON(errorMessage, s.jsonIndent); err == nil {
 			s.ResponseWriter.Write(doc)
