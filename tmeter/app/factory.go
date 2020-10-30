@@ -4,6 +4,8 @@ import (
 	"tmeter/app/api"
 	auth "tmeter/app/modules/auth/services"
 	"tmeter/app/modules/devices/repositories"
+	repositories2 "tmeter/app/modules/measurements/repositories"
+	"tmeter/app/modules/measurements/services"
 )
 import devicesServices "tmeter/app/modules/devices/services"
 
@@ -12,13 +14,15 @@ type AppFactoryInterface interface {
 	GetDevicesService() devicesServices.DevicesServiceInterface
 	GetAPIProtocol() *api.APIProtocol
 	GetAuthService() *auth.AuthService
+	GetMeasurementsService() services.MeasurementsServiceInterface
 }
 
 type AppFactory struct {
-	devicesRepository repositories.DevicesRepositoryInterface
-	devicesService    *devicesServices.DevicesService
-	apiProtocol       *api.APIProtocol
-	authService       *auth.AuthService
+	devicesRepository   repositories.DevicesRepositoryInterface
+	devicesService      *devicesServices.DevicesService
+	apiProtocol         *api.APIProtocol
+	authService         *auth.AuthService
+	measurementsService services.MeasurementsServiceInterface
 }
 
 func NewAppFactory() *AppFactory {
@@ -56,4 +60,13 @@ func (f *AppFactory) GetAuthService() *auth.AuthService {
 		f.authService = &auth.AuthService{}
 	}
 	return f.authService
+}
+
+func (f *AppFactory) GetMeasurementsService() services.MeasurementsServiceInterface {
+	if f.measurementsService == nil {
+		f.measurementsService = services.NewMeasurementsService(
+			&repositories2.FloatLog{},
+		)
+	}
+	return f.measurementsService
 }

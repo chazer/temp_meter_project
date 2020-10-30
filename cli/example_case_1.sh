@@ -21,6 +21,13 @@ create_device_token() {
   echo "$TOKEN"
 }
 
+get_my_devices() {
+  local token="$1"
+  local JSON; JSON="$( api_get_my_devices "$token" )" || return 1
+  local UUIDS; UUIDS="$( json_extract "$JSON" "items[].device.uuid" )" || return 1
+  echo "$UUIDS"
+}
+
 #create_device() {
 #  local email="$1"
 #  local name="$2"
@@ -34,26 +41,29 @@ create_device_token() {
 EMAIL="$( gen_random_email 3 )"
 DNAME="$( gen_random_device_name 10 )"
 
+echo "Register new user:" >&2
 UTOKEN="$( create_user_token "$EMAIL" )" || { echo "Error create token"; exit 1; }
-echo "USER EMAIL = ${EMAIL}"
-echo "USER AUTH TOKEN = ${UTOKEN}"
+echo "  user email = ${EMAIL}"
+echo "  user auth token = ${UTOKEN}"
+echo "" >&2
 
+echo "Register new device:" >&2
 DTOKEN="$( create_device_token "$DNAME" "$EMAIL")" || { echo "Error create token"; exit 1; }
-echo "DEVICE NAME = ${DNAME}"
-echo "DEVICE EMAIL = ${EMAIL}"
-echo "DEVICE AUTH TOKEN = ${DTOKEN}"
+echo "  device name = ${DNAME}"
+echo "  device email = ${EMAIL}"
+echo "  device auth token = ${DTOKEN}"
+echo "" >&2
 
 #UUID="$( create_device "$EMAIL" "$DNAME")" || { echo "Error create device"; exit 1; }
 #echo "DEVICE NAME = ${DNAME}"
 #echo "DEVICE UUID = ${UUID}"
 
-
-get_my_devices() {
-  local token="$1"
-  local JSON; JSON="$( api_get_my_devices "$token" )" || return 1
-  local UUIDS; UUIDS="$( json_extract "$JSON" "items[].device.uuid" )" || return 1
-  echo "$UUIDS"
-}
+echo "Fill device with some data" >&2
+for _ in $(seq 10); do
+   api_device_save_measurement "$DTOKEN" "$(random_float_in_range -40 40 )" >/dev/null 2>&1 || { echo Error; exit 1; }
+   printf "." >&2
+done
+echo "" >&2
 
 DEVICES_UUIDs="$( get_my_devices "$UTOKEN" )" || { echo Error; exit 1; }
 

@@ -8,6 +8,7 @@ import (
 	"tmeter/app/consts"
 	"tmeter/app/modules/auth"
 	"tmeter/app/modules/devices"
+	"tmeter/app/modules/measurements"
 	"tmeter/app/modules/users"
 	"tmeter/lib/debug"
 	"tmeter/lib/env"
@@ -29,6 +30,7 @@ func main() {
 
 	auth.Init(r, factory)
 	devices.Init(r, factory)
+	measurements.Init(r, factory)
 	users.Init(r, factory)
 
 	s := &http.Server{

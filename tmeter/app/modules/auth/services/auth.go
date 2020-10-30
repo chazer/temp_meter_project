@@ -59,3 +59,12 @@ func (s *AuthService) GetEmailFromToken(token string) (*string, error) {
 	email := string(sDec)
 	return &email, nil
 }
+
+func (s *AuthService) GetUUIDFromToken(token string) (*string, error) {
+	sDec, err := base64.StdEncoding.DecodeString(token)
+	if err != nil {
+		return nil, err
+	}
+	uuid := string(sDec)
+	return &uuid, nil
+}

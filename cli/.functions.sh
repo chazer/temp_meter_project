@@ -23,3 +23,13 @@ gen_random_device_name() {
   local R=$(( ( RANDOM % SIZE )  + 1 ))
   echo "Device$R"
 }
+
+time_ms() {
+  date +%s%N | cut -b1-13
+}
+
+random_float_in_range() {
+  local a="$1"
+  local b="$2"
+  echo "$(( a + RANDOM % ( b - a ) )).$(( RANDOM % 999 ))"
+}
