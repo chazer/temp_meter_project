@@ -6,6 +6,7 @@ import (
 	"tmeter/app/modules/devices/repositories"
 	repositories2 "tmeter/app/modules/measurements/repositories"
 	"tmeter/app/modules/measurements/services"
+	repositories3 "tmeter/app/modules/users/repositories"
 )
 import devicesServices "tmeter/app/modules/devices/services"
 
@@ -13,7 +14,7 @@ type AppFactoryInterface interface {
 	GetDevicesRepository() repositories.DevicesRepositoryInterface
 	GetDevicesService() devicesServices.DevicesServiceInterface
 	GetAPIProtocol() *api.APIProtocol
-	GetAuthService() *auth.AuthService
+	GetAuthService() auth.AuthServiceInterface
 	GetMeasurementsService() services.MeasurementsServiceInterface
 }
 
@@ -21,7 +22,7 @@ type AppFactory struct {
 	devicesRepository   repositories.DevicesRepositoryInterface
 	devicesService      *devicesServices.DevicesService
 	apiProtocol         *api.APIProtocol
-	authService         *auth.AuthService
+	authService         auth.AuthServiceInterface
 	measurementsService services.MeasurementsServiceInterface
 }
 
@@ -55,9 +56,11 @@ func (f *AppFactory) GetAPIProtocol() *api.APIProtocol {
 	return f.apiProtocol
 }
 
-func (f *AppFactory) GetAuthService() *auth.AuthService {
+func (f *AppFactory) GetAuthService() auth.AuthServiceInterface {
 	if f.authService == nil {
-		f.authService = &auth.AuthService{}
+		f.authService = auth.NewAuthService(
+			repositories3.MakeUsersInmemoryRepository(),
+		)
 	}
 	return f.authService
 }

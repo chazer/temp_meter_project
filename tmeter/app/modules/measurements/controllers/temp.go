@@ -20,14 +20,14 @@ type DeviceTempController struct {
 	Handlers            *router.Routes
 	api                 *api.APIProtocol
 	formatter           api.FormatterConfig
-	auth                *auth.AuthService
+	auth                auth.AuthServiceInterface
 	devicesService      devices.DevicesServiceInterface
 	measurementsService services.MeasurementsServiceInterface
 }
 
 func NewDeviceTempController(
 	protocol *api.APIProtocol,
-	auth *auth.AuthService,
+	auth auth.AuthServiceInterface,
 	devices devices.DevicesServiceInterface,
 	measurements services.MeasurementsServiceInterface,
 ) *DeviceTempController {
@@ -66,7 +66,7 @@ type tokenSaveMetricsDTO = []tempMetricPoint
 func (c *DeviceTempController) handlerSaveTempMetrics(resp http.ResponseWriter, req *http.Request) {
 	// TODO: extract device uuid by middleware
 	token := req.URL.Query().Get("token")
-	uuid, err := (&auth.AuthService{}).GetUUIDFromToken(token)
+	uuid, err := c.auth.GetUUIDFromToken(token)
 	if err != nil {
 		resp.WriteHeader(http.StatusUnauthorized)
 		return

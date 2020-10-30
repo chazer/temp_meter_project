@@ -6,15 +6,18 @@ import (
 	"strings"
 	devices "tmeter/app/modules/devices/entities"
 	users "tmeter/app/modules/users/entities"
+	"tmeter/app/modules/users/repositories"
 )
 
-type AuthService struct{}
+type authService struct {
+	Users repositories.UsersRepositoryInterface
+}
 
 // TODO: add token encoder interface
 // TODO: add JWT token implementation
 // TODO: use Users service
 
-func (s *AuthService) encodeToken(email string) (*string, error) {
+func (s *authService) encodeToken(email string) (*string, error) {
 	if email == "" {
 		return nil, errors.New("email is empty")
 	}
@@ -22,7 +25,7 @@ func (s *AuthService) encodeToken(email string) (*string, error) {
 	return &str, nil
 }
 
-func (s *AuthService) decodeToken(token string) (*string, error) {
+func (s *authService) decodeToken(token string) (*string, error) {
 	b, err := base64.StdEncoding.DecodeString(token)
 	if err == nil {
 		return nil, errors.New("invalid token")
@@ -31,7 +34,7 @@ func (s *AuthService) decodeToken(token string) (*string, error) {
 	return &email, nil
 }
 
-func (s *AuthService) IssueTokenForUser(user *users.User) (*string, error) {
+func (s *authService) IssueTokenForUser(user *users.User) (*string, error) {
 	email := strings.TrimSpace(user.Email)
 	if email == "" {
 		return nil, errors.New("email is empty")
@@ -43,7 +46,7 @@ func (s *AuthService) IssueTokenForUser(user *users.User) (*string, error) {
 	return token, nil
 }
 
-func (s *AuthService) IssueTokenForDevice(device *devices.Device) (*string, error) {
+func (s *authService) IssueTokenForDevice(device *devices.Device) (*string, error) {
 	token, err := s.encodeToken(device.UUID)
 	if err != nil {
 		return nil, err
@@ -51,7 +54,7 @@ func (s *AuthService) IssueTokenForDevice(device *devices.Device) (*string, erro
 	return token, nil
 }
 
-func (s *AuthService) GetEmailFromToken(token string) (*string, error) {
+func (s *authService) GetEmailFromToken(token string) (*string, error) {
 	sDec, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return nil, err
@@ -60,11 +63,17 @@ func (s *AuthService) GetEmailFromToken(token string) (*string, error) {
 	return &email, nil
 }
 
-func (s *AuthService) GetUUIDFromToken(token string) (*string, error) {
+func (s *authService) GetUUIDFromToken(token string) (*string, error) {
 	sDec, err := base64.StdEncoding.DecodeString(token)
 	if err != nil {
 		return nil, err
 	}
 	uuid := string(sDec)
 	return &uuid, nil
+}
+
+func NewAuthService(users repositories.UsersRepositoryInterface) AuthServiceInterface {
+	return &authService{
+		users,
+	}
 }

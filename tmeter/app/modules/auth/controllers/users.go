@@ -17,11 +17,11 @@ import "tmeter/lib/router"
 type AuthUsersController struct {
 	Handlers  *router.Routes
 	api       *api.APIProtocol
-	auth      *auth.AuthService
+	auth      auth.AuthServiceInterface
 	formatter api.FormatterConfig
 }
 
-func NewAuthUsersController(protocol *api.APIProtocol, auth *auth.AuthService) *AuthUsersController {
+func NewAuthUsersController(protocol *api.APIProtocol, auth auth.AuthServiceInterface) *AuthUsersController {
 	c := &AuthUsersController{
 		Handlers: router.NewRoutes(),
 		api:      protocol,

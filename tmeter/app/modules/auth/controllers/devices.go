@@ -17,13 +17,13 @@ type AuthDevicesController struct {
 	Handlers       *router.Routes
 	api            *api.APIProtocol
 	formatter      api.FormatterConfig
-	auth           *auth.AuthService
+	auth           auth.AuthServiceInterface
 	devicesService devices.DevicesServiceInterface
 }
 
 func NewAuthDevicesController(
 	protocol *api.APIProtocol,
-	auth *auth.AuthService,
+	auth auth.AuthServiceInterface,
 	devices devices.DevicesServiceInterface,
 ) *AuthDevicesController {
 	c := &AuthDevicesController{

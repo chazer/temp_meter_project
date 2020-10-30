@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"tmeter/app/api"
 	apiViews "tmeter/app/api/views"
+	auth "tmeter/app/modules/auth/services"
 	"tmeter/app/modules/devices/entities"
 	"tmeter/app/modules/devices/views"
 	"tmeter/lib/middlewares"
@@ -18,15 +19,18 @@ type DevicesController struct {
 	Handlers       *router.Routes
 	devicesService services.DevicesServiceInterface
 	formatter      api.FormatterConfig
+	auth           auth.AuthServiceInterface
 }
 
 func NewDevicesController(
 	devices services.DevicesServiceInterface,
 	protocol *api.APIProtocol,
+	auth auth.AuthServiceInterface,
 ) *DevicesController {
 	c := &DevicesController{
 		api:            protocol,
 		devicesService: devices,
+		auth:           auth,
 		Handlers:       router.NewRoutes(),
 		formatter: api.FormatterConfig{
 			DocumentView: views.NewDeviceApiView(),

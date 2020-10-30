@@ -10,6 +10,7 @@ func Init(r *router.Router, f app.AppFactoryInterface) {
 	devices := c.NewDevicesController(
 		f.GetDevicesService(),
 		f.GetAPIProtocol(),
+		f.GetAuthService(),
 	)
 
 	r.AddRoutes("/devices", devices.Handlers)

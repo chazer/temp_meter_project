@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	auth "tmeter/app/modules/auth/services"
 	devices "tmeter/app/modules/devices/services"
 )
 
@@ -10,7 +9,7 @@ func (c *DevicesController) handlerGetMyDevices(writer http.ResponseWriter, requ
 	token := request.URL.Query().Get("token")
 
 	// TODO: extract user by middleware
-	email, err := (&auth.AuthService{}).GetEmailFromToken(token)
+	email, err := c.auth.GetEmailFromToken(token)
 	if err != nil {
 		writer.WriteHeader(http.StatusUnauthorized)
 		return
