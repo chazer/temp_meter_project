@@ -1,19 +1,13 @@
 package controllers
 
-import (
-	"encoding/json"
-	"net/http"
-)
-
-import "tmeter/lib/debug"
-
-type RegisterDeviceDTO struct {
+/*
+type registerDeviceDTO struct {
 	DeviceName string `json:"device_name"`
 	ForEmail   string `json:"for_email"`
 }
 
 func (c *DevicesController) handlerCreateNewDevice(resp http.ResponseWriter, req *http.Request) {
-	var dto RegisterDeviceDTO
+	var dto registerDeviceDTO
 	err := json.NewDecoder(req.Body).Decode(&dto)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
@@ -32,13 +26,14 @@ func (c *DevicesController) handlerCreateNewDevice(resp http.ResponseWriter, req
 		return
 	}
 
-	d, err := c.devicesService.CreateDevice(dto.ForEmail)
+	d, err := c.devicesService.CreateDevice(dto.DeviceName, dto.ForEmail)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	debug.Printf("device created (UUID:%s) for User(%s)", d.UUID, d.UserEmail)
+	debug.Printf("device created (UUID:%s) for User(%s)", d.UUID, d.OwnerEmail)
 
 	c.api.WriteEntityDocumentResponse(resp, &c.formatter, d)
 }
+*/

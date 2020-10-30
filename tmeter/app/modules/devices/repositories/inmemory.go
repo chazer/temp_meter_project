@@ -34,10 +34,10 @@ func (r *DevicesInmemoryRepository) Insert(d *entities.Device) *entities.Device 
 	uuid, _ := helpers.GenUUID()
 	c.UUID = uuid
 
-	if list := r.byEmail[c.UserEmail]; list != nil {
-		r.byEmail[c.UserEmail] = append(list, c)
+	if list := r.byEmail[c.OwnerEmail]; list != nil {
+		r.byEmail[c.OwnerEmail] = append(list, c)
 	} else {
-		r.byEmail[c.UserEmail] = []*entities.Device{c}
+		r.byEmail[c.OwnerEmail] = []*entities.Device{c}
 	}
 
 	r.byUUID[c.UUID] = c
@@ -47,7 +47,7 @@ func (r *DevicesInmemoryRepository) Insert(d *entities.Device) *entities.Device 
 
 func (r *DevicesInmemoryRepository) RemoveByUUID(uuid string) bool {
 	if f := r.FindByUUID(uuid); f != nil {
-		delete(r.byEmail, f.UserEmail)
+		delete(r.byEmail, f.OwnerEmail)
 		delete(r.byUUID, f.UUID)
 		return true
 	}

@@ -3,8 +3,9 @@ package entities
 import "tmeter/lib/helpers"
 
 type Device struct {
-	UUID      string
-	UserEmail string
+	UUID       string
+	Name       string
+	OwnerEmail string
 }
 
 func MakeDevice() Device {
@@ -16,7 +17,8 @@ func MakeDevice() Device {
 
 func (d Device) Copy() *Device {
 	return &Device{
-		UUID:      d.UUID,
-		UserEmail: d.UserEmail,
+		UUID:       d.UUID,
+		Name:       d.Name,
+		OwnerEmail: d.OwnerEmail,
 	}
 }

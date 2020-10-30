@@ -8,19 +8,19 @@ type structTokenDoc struct {
 	Token string `json:"token"`
 }
 
-type userTokenScheme struct {
+type tokenScheme struct {
 	views.StructTaggingScheme
 }
 
-func (w *userTokenScheme) ToTaggedStruct(data interface{}) (interface{}, error) {
+func (w *tokenScheme) ToTaggedStruct(data interface{}) (interface{}, error) {
 	token := data.(string)
 	return structTokenDoc{
 		Token: token,
 	}, nil
 }
 
-func NewUserTokenResponseView() views.ApiViewInterface {
+func NewAuthTokenResponseView() views.ApiViewInterface {
 	return &views.ApiView{
-		Scheme: &userTokenScheme{},
+		Scheme: &tokenScheme{},
 	}
 }

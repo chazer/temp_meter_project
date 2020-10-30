@@ -35,11 +35,11 @@ func NewDevicesController(
 	}
 
 	// TODO: rewrite it
-	c.Handlers.POST("",
-		middlewares.LogMiddleware(
-			wrappers.NewJsonErrorsWrapper().AsMiddleware()(
-				middlewares.AuthMiddleware(
-					c.handlerCreateNewDevice))))
+	//c.Handlers.POST("",
+	//	middlewares.LogMiddleware(
+	//		wrappers.NewJsonErrorsWrapper().AsMiddleware()(
+	//			middlewares.AuthMiddleware(
+	//				c.handlerCreateNewDevice))))
 	c.Handlers.GET("/?token",
 		middlewares.LogMiddleware(
 			wrappers.NewJsonErrorsWrapper().AsMiddleware()(

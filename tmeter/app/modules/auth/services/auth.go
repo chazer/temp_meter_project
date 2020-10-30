@@ -4,7 +4,8 @@ import (
 	"encoding/base64"
 	"errors"
 	"strings"
-	"tmeter/app/modules/users/entities"
+	devices "tmeter/app/modules/devices/entities"
+	users "tmeter/app/modules/users/entities"
 )
 
 type AuthService struct{}
@@ -30,7 +31,7 @@ func (s *AuthService) decodeToken(token string) (*string, error) {
 	return &email, nil
 }
 
-func (s *AuthService) CreateToken(user *entities.User) (*entities.User, error) {
+func (s *AuthService) IssueTokenForUser(user *users.User) (*string, error) {
 	email := strings.TrimSpace(user.Email)
 	if email == "" {
 		return nil, errors.New("email is empty")
@@ -39,8 +40,15 @@ func (s *AuthService) CreateToken(user *entities.User) (*entities.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	user.Token = *token
-	return user, nil
+	return token, nil
+}
+
+func (s *AuthService) IssueTokenForDevice(device *devices.Device) (*string, error) {
+	token, err := s.encodeToken(device.UUID)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
 }
 
 func (s *AuthService) GetEmailFromToken(token string) (*string, error) {

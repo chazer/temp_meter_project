@@ -14,20 +14,20 @@ import (
 
 import "tmeter/lib/router"
 
-type AuthController struct {
+type AuthUsersController struct {
 	Handlers  *router.Routes
 	api       *api.APIProtocol
 	auth      *auth.AuthService
 	formatter api.FormatterConfig
 }
 
-func NewAuthController(protocol *api.APIProtocol, auth *auth.AuthService) *AuthController {
-	c := &AuthController{
+func NewAuthUsersController(protocol *api.APIProtocol, auth *auth.AuthService) *AuthUsersController {
+	c := &AuthUsersController{
 		Handlers: router.NewRoutes(),
 		api:      protocol,
 		auth:     auth,
 		formatter: api.FormatterConfig{
-			DocumentView: views.NewUserTokenResponseView(),
+			DocumentView: views.NewAuthTokenResponseView(),
 		},
 	}
 
@@ -37,7 +37,7 @@ func NewAuthController(protocol *api.APIProtocol, auth *auth.AuthService) *AuthC
 		middlewares.LogMiddleware(
 			// TODO: Add ContentType guard middleware
 			wrappers.NewJsonErrorsWrapper().AsMiddleware()(
-				c.handlerCreateNewToken,
+				c.handlerCreateNewUserToken,
 			),
 		),
 		// BODY: {
@@ -45,6 +45,7 @@ func NewAuthController(protocol *api.APIProtocol, auth *auth.AuthService) *AuthC
 		//   user_email: string,
 		// }
 	)
+
 	return c
 }
 
@@ -53,7 +54,7 @@ type tokenRequestDTO struct {
 	UserEmail string `json:"user_email"`
 }
 
-func (c *AuthController) handlerCreateNewToken(resp http.ResponseWriter, req *http.Request) {
+func (c *AuthUsersController) handlerCreateNewUserToken(resp http.ResponseWriter, req *http.Request) {
 	var dto tokenRequestDTO
 	err := json.NewDecoder(req.Body).Decode(&dto)
 	if err != nil {
@@ -63,7 +64,7 @@ func (c *AuthController) handlerCreateNewToken(resp http.ResponseWriter, req *ht
 
 	debug.Printf("create token for (email=%s; name=%s)", dto.UserEmail, dto.UserName)
 
-	user, err := c.auth.CreateToken(&entities.User{
+	token, err := c.auth.IssueTokenForUser(&entities.User{
 		Name:  dto.UserName,
 		Email: dto.UserEmail,
 	})
@@ -72,5 +73,5 @@ func (c *AuthController) handlerCreateNewToken(resp http.ResponseWriter, req *ht
 		return
 	}
 
-	c.api.WriteEntityDocumentResponse(resp, &c.formatter, user.Token)
+	c.api.WriteEntityDocumentResponse(resp, &c.formatter, *token)
 }

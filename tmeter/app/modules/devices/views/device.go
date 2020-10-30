@@ -23,7 +23,7 @@ func (w *deviceScheme) ToTaggedStruct(i interface{}) (interface{}, error) {
 	return structDeviceDoc{
 		Device: structDeviceData{
 			UUID:  d.UUID,
-			Email: d.UserEmail,
+			Email: d.OwnerEmail,
 		},
 	}, nil
 }

@@ -15,7 +15,7 @@ func (c *DevicesController) handlerGetOneDevice(writer http.ResponseWriter, requ
 		writer.WriteHeader(404)
 	}
 	if d != nil {
-		debug.Printf("found: (uuid=%s; email=%s)", d.UUID, d.UserEmail)
+		debug.Printf("found: (uuid=%s; email=%s)", d.UUID, d.OwnerEmail)
 		c.sendItem(writer, d)
 
 		writer.WriteHeader(201)

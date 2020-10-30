@@ -9,7 +9,7 @@ import "tmeter/app/modules/devices/entities"
 const ErrNoDevice = "no devices"
 
 type DevicesServiceInterface interface {
-	CreateDevice(email string) (*entities.Device, error)
+	CreateDevice(name string, email string) (*entities.Device, error)
 	GetDeviceById(uuid string) (*entities.Device, error)
 	// TODO: return Cursor
 	GetDevicesByEmail(email string) ([]*entities.Device, error)
@@ -31,9 +31,10 @@ func MakeDevicesService(config *DevicesServiceConfig) *DevicesService {
 	return s
 }
 
-func (s *DevicesService) CreateDevice(email string) (*entities.Device, error) {
+func (s *DevicesService) CreateDevice(name string, email string) (*entities.Device, error) {
 	d := entities.MakeDevice()
-	d.UserEmail = email
+	d.Name = name
+	d.OwnerEmail = email
 	inserted := s.registry.Insert(&d)
 	return inserted, nil
 }

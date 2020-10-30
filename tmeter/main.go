@@ -25,6 +25,8 @@ func main() {
 
 	r := router.NewRouter()
 
+	// TODO: add global json content type guard
+
 	auth.Init(r, factory)
 	devices.Init(r, factory)
 	users.Init(r, factory)

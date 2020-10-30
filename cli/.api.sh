@@ -22,16 +22,22 @@ api_request() {
   fi
 }
 
-api_create_device() {
+#api_create_device() {
+#  local email="$1"
+#  local name="$2"
+#  api_request POST "${API_URI}/devices" '{"device_name":"'${name}'","for_email":"'${email}'"}'
+#}
+
+api_get_user_token() {
   local email="$1"
   local name="$2"
-  api_request POST "${API_URI}/devices" '{"device_name":"'${name}'","for_email":"'${email}'"}'
+  api_request POST "${API_URI}/auth/user/token" '{"user_email":"'${email}'"}'
 }
 
-api_get_token() {
-  local email="$1"
-  local name="$2"
-  api_request POST "${API_URI}/auth/token" '{"user_name":"'${name}'","user_email":"'${email}'"}'
+api_get_device_token() {
+  local name="$1"
+  local email="$2"
+  api_request POST "${API_URI}/auth/device/token" '{"device_name":"'${name}'","user_email":"'${email}'"}'
 }
 
 api_get_device() {

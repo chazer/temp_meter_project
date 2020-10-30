@@ -39,37 +39,37 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 			// found
 			f := findByUUID(t, repo, i.UUID)
 
-			if i.UUID != f.UUID || i.UserEmail != f.UserEmail {
+			if i.UUID != f.UUID || i.OwnerEmail != f.OwnerEmail {
 				t.Fatalf("Expected the same values")
 			}
 		})
 
 		t.Run("should keep value copy", func(t *testing.T) {
 			a := entities.MakeDevice()
-			a.UserEmail = "a@local"
+			a.OwnerEmail = "a@local"
 			aUUID := insertAndReturnUUID(t, repo, &a)
 
 			// reuse variable
-			a.UserEmail = "b@local"
+			a.OwnerEmail = "b@local"
 
 			f := findByUUID(t, repo, aUUID)
-			if f.UserEmail != "a@local" {
+			if f.OwnerEmail != "a@local" {
 				t.Fatalf("Expected previous email")
 			}
 		})
 
 		t.Run("should not replace item", func(t *testing.T) {
 			a := entities.MakeDevice()
-			a.UserEmail = "a@local"
+			a.OwnerEmail = "a@local"
 			aUUID := insertAndReturnUUID(t, repo, &a)
 
 			b := entities.MakeDevice()
 			b.UUID = aUUID
-			b.UserEmail = "b@local"
+			b.OwnerEmail = "b@local"
 			repo.Insert(&b)
 
 			f := findByUUID(t, repo, aUUID)
-			if f.UserEmail != "a@local" {
+			if f.OwnerEmail != "a@local" {
 				t.Fatalf("Expected previous value")
 			}
 		})
@@ -79,15 +79,15 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 		repo := factory.NewRepo()
 
 		a := entities.MakeDevice()
-		a.UserEmail = "a@local"
+		a.OwnerEmail = "a@local"
 		aUUID := insertAndReturnUUID(t, repo, &a)
 
 		b := entities.MakeDevice()
-		b.UserEmail = "b@local"
+		b.OwnerEmail = "b@local"
 		bUUID := insertAndReturnUUID(t, repo, &b)
 
 		c := entities.MakeDevice()
-		c.UserEmail = "c@local"
+		c.OwnerEmail = "c@local"
 		cUUID := insertAndReturnUUID(t, repo, &c)
 
 		f := findByUUID(t, repo, bUUID)
@@ -122,12 +122,12 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 		repo := factory.NewRepo()
 
 		a := entities.MakeDevice()
-		a.UserEmail = "a@local"
+		a.OwnerEmail = "a@local"
 		aUUID := insertAndReturnUUID(t, repo, &a)
 
 		t.Run("should return item", func(t *testing.T) {
 			f := findByUUID(t, repo, aUUID)
-			if f.UserEmail != "a@local" {
+			if f.OwnerEmail != "a@local" {
 				t.Fatalf("Expected item")
 			}
 		})
@@ -141,10 +141,10 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 
 		t.Run("should return copy", func(t *testing.T) {
 			b := repo.FindByUUID(aUUID)
-			b.UserEmail = "b@local"
+			b.OwnerEmail = "b@local"
 
 			f := repo.FindByUUID(aUUID)
-			if f.UserEmail != "a@local" {
+			if f.OwnerEmail != "a@local" {
 				t.Fatalf("Expected unchanged value")
 			}
 		})
@@ -155,17 +155,17 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 
 		a := entities.MakeDevice()
 		a.UUID = "id1"
-		a.UserEmail = "a@local"
+		a.OwnerEmail = "a@local"
 		repo.Insert(&a)
 
 		b := entities.MakeDevice()
 		b.UUID = "id2"
-		b.UserEmail = "a@local"
+		b.OwnerEmail = "a@local"
 		repo.Insert(&b)
 
 		c := entities.MakeDevice()
 		c.UUID = "id3"
-		c.UserEmail = "b@local"
+		c.OwnerEmail = "b@local"
 		repo.Insert(&c)
 
 		t.Run("should return two", func(t *testing.T) {
@@ -191,10 +191,10 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 
 		t.Run("should return copy", func(t *testing.T) {
 			l1 := repo.FindByEmail("b@local")
-			l1[0].UserEmail = "c@local"
+			l1[0].OwnerEmail = "c@local"
 
 			l2 := repo.FindByEmail("b@local")
-			if l2[0].UserEmail != "b@local" {
+			if l2[0].OwnerEmail != "b@local" {
 				t.Fatalf("Expected unchanged value")
 			}
 		})
