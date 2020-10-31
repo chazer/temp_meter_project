@@ -42,7 +42,14 @@ api_get_device_token() {
 
 api_get_device() {
   local uuid="$1"
-  api_request GET "${API_URI}/devices/byId?id=${uuid}"
+  local token="$2"
+  api_request GET "${API_URI}/devices/byId?id=${uuid}&token=${token}"
+}
+
+api_get_device_log() {
+  local uuid="$1"
+  local token="$2"
+  api_request GET "${API_URI}/devices/byId/log?id=${uuid}&token=${token}"
 }
 
 api_get_my_devices() {

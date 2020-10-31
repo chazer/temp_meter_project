@@ -89,7 +89,7 @@ func (c *DeviceTempController) handlerSaveTempMetrics(resp http.ResponseWriter, 
 	debug.Printf("got metrics (count=%d)", len(dto))
 
 	for _, record := range dto {
-		c.measurementsService.WriteTemperature(record.Time, record.Value)
+		c.measurementsService.WriteTemperature(d, record.Time, record.Value)
 	}
 
 	resp.WriteHeader(http.StatusCreated)

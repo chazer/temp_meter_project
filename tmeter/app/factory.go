@@ -65,11 +65,13 @@ func (f *AppFactory) GetAuthService() auth.AuthServiceInterface {
 	return f.authService
 }
 
+func (f *AppFactory) CreateDeviceLog() repositories2.DeviceLogInterface {
+	return &repositories2.MeasurementsLog{}
+}
+
 func (f *AppFactory) GetMeasurementsService() services.MeasurementsServiceInterface {
 	if f.measurementsService == nil {
-		f.measurementsService = services.NewMeasurementsService(
-			&repositories2.FloatLog{},
-		)
+		f.measurementsService = services.NewMeasurementsService(f.CreateDeviceLog)
 	}
 	return f.measurementsService
 }

@@ -76,7 +76,14 @@ else
     n=$(( n + 1))
     echo "- Device #$n:"
     echo "  UUID: $UUID:"
-    DEVICE_JSON="$( api_get_device "$UUID" )" || { echo "Error get device by uuid"; exit 1; }
-    echo "  json: ${DEVICE_JSON}"
+    DEVICE_JSON="$( api_get_device "$UUID" "$UTOKEN" )" || { echo "Error get device by uuid"; exit 1; }
+    DEVICE_UPDATED_AT="$( json_extract "$DEVICE_JSON" "device.updatedAt" )"
+    echo "  Updated At: ${DEVICE_UPDATED_AT}"
+    DEVICE_LOG_JSON="$( api_get_device_log "$UUID" "$UTOKEN" )" || { echo "Error get device log data"; exit 1; }
+    echo "  History:"
+    json_extract "$DEVICE_LOG_JSON" 'items[] | "\(.time) \(.temperature)"' \
+    | while read -r time temp; do
+      printf "  - %s\t%s\n" "$time" "$temp"
+    done
   done
 fi

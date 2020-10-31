@@ -11,6 +11,7 @@ func Init(r *router.Router, f app.AppFactoryInterface) {
 		f.GetDevicesService(),
 		f.GetAPIProtocol(),
 		f.GetAuthService(),
+		f.GetMeasurementsService(),
 	)
 
 	r.AddRoutes("/devices", devices.Handlers)
