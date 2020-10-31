@@ -73,6 +73,20 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 				t.Fatalf("Expected previous value")
 			}
 		})
+
+		d1 := entities.User{}
+		d1.Email = "d@local"
+		d1UUID := insertAndReturnUUID(t, repo, &d1)
+
+		d2 := entities.User{}
+		d2.Email = "d@local"
+		d2UUID := insertAndReturnUUID(t, repo, &d2)
+
+		t.Run("should return different id for same email", func(t *testing.T) {
+			if d1UUID == d2UUID {
+				t.Fatalf("UUID should be different")
+			}
+		})
 	})
 
 	t.Run("Remove|RemoveByUUID method", func(t *testing.T) {
@@ -94,6 +108,28 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 		repo.Remove(f)
 		repo.RemoveByUUID(cUUID)
 
+		d1 := entities.User{}
+		d1.Email = "d@local"
+		d1UUID := insertAndReturnUUID(t, repo, &d1)
+
+		d2 := entities.User{}
+		d2.Email = "d@local"
+		d2UUID := insertAndReturnUUID(t, repo, &d2)
+
+		repo.RemoveByUUID(d1UUID)
+
+		e := entities.User{}
+		e.Email = "e@local"
+		eUUID := insertAndReturnUUID(t, repo, &e)
+		repo.RemoveByUUID(eUUID)
+		insertAndReturnUUID(t, repo, &e)
+
+		t.Run("should be different id", func(t *testing.T) {
+			if d1UUID == d2UUID {
+				t.Fatalf("UUID should be different")
+			}
+		})
+
 		t.Run("should find other item after remove", func(t *testing.T) {
 			findByUUID(t, repo, aUUID)
 		})
@@ -113,6 +149,18 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 			}
 			if l := repo.FindByEmail("c@local"); len(l) != 0 {
 				t.Fatalf("Expected empty list")
+			}
+		})
+
+		t.Run("should find item by email after remove", func(t *testing.T) {
+			if l := repo.FindByEmail("d@local"); len(l) != 1 {
+				t.Fatalf("Expected non empty list")
+			}
+		})
+
+		t.Run("should find item by email after insert after remove", func(t *testing.T) {
+			if l := repo.FindByEmail("e@local"); len(l) != 1 {
+				t.Fatalf("Expected non empty list")
 			}
 		})
 
@@ -196,6 +244,86 @@ func RepositoryImplementationTestCase(t *testing.T, factory struct {
 			l2 := repo.FindByEmail("b@local")
 			if l2[0].Email != "b@local" {
 				t.Fatalf("Expected unchanged value")
+			}
+		})
+	})
+
+	t.Run("Replace method", func(t *testing.T) {
+
+		t.Run("should keep same numbers of items after Replace one", func(t *testing.T) {
+			repo := factory.NewRepo()
+
+			a := entities.User{}
+			a.Email = "a@local"
+			aUUID := insertAndReturnUUID(t, repo, &a)
+
+			b := entities.User{}
+			b.Email = "b@local"
+			repo.Replace(aUUID, &b)
+
+			if repo.Count() != 1 {
+				t.Fatalf("Something wrong with count of items")
+			}
+		})
+
+		t.Run("should replace one item with another", func(t *testing.T) {
+			repo := factory.NewRepo()
+
+			a := entities.User{}
+			a.Email = "a@local"
+			aUUID := insertAndReturnUUID(t, repo, &a)
+
+			b := entities.User{}
+			b.Email = "b@local"
+			repo.Replace(aUUID, &b)
+
+			if repo.FindByUUID(b.UUID) == nil {
+				t.Fatalf("Replace method will change item id")
+			}
+
+			if repo.FindByUUID(aUUID) != nil {
+				t.Fatalf("Replace method not remove old item")
+			}
+		})
+	})
+
+	t.Run("Update method", func(t *testing.T) {
+
+		t.Run("should keep same numbers of items after Update one", func(t *testing.T) {
+			repo := factory.NewRepo()
+
+			a := entities.User{}
+			a.Email = "a@local"
+			aUUID := insertAndReturnUUID(t, repo, &a)
+
+			b := entities.User{}
+			b.Email = "b@local"
+			repo.Update(aUUID, &b)
+
+			if repo.Count() != 1 {
+				t.Fatalf("Something wrong with count of items")
+			}
+		})
+
+		t.Run("should replace one item with another", func(t *testing.T) {
+			repo := factory.NewRepo()
+
+			a := entities.User{}
+			a.Email = "a@local"
+			aUUID := insertAndReturnUUID(t, repo, &a)
+
+			b := entities.User{}
+			b.Email = "b@local"
+			repo.Update(aUUID, &b)
+
+			c := repo.FindByUUID(aUUID)
+
+			if c == nil {
+				t.Fatalf("Update method will remove old item")
+			}
+
+			if c.Email != "b@local" {
+				t.Fatalf("Update method will not change item values")
 			}
 		})
 	})

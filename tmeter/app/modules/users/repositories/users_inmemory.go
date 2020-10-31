@@ -27,17 +27,12 @@ func (r *UsersInmemoryRepository) Create() *entities.User {
 	return d
 }
 
-func (r *UsersInmemoryRepository) Insert(d *entities.User) *entities.User {
-	c := d.Copy()
-
-	// Repo has own UUID
-	uuid, _ := helpers.GenUUID()
-	c.UUID = uuid
-
+func (r *UsersInmemoryRepository) insert(c *entities.User) *entities.User {
 	if list := r.byEmail[c.Email]; list != nil {
 		r.byEmail[c.Email] = append(list, c)
 	} else {
-		r.byEmail[c.Email] = []*entities.User{c}
+		list = make([]*entities.User, 0)
+		r.byEmail[c.Email] = append(list, c)
 	}
 
 	r.byUUID[c.UUID] = c
@@ -45,9 +40,26 @@ func (r *UsersInmemoryRepository) Insert(d *entities.User) *entities.User {
 	return c
 }
 
+func (r *UsersInmemoryRepository) Insert(d *entities.User) *entities.User {
+	c := d.Copy()
+
+	// Repo has own UUID
+	uuid, _ := helpers.GenUUID()
+	c.UUID = uuid
+
+	return r.insert(c)
+}
+
 func (r *UsersInmemoryRepository) RemoveByUUID(uuid string) bool {
 	if f := r.FindByUUID(uuid); f != nil {
-		delete(r.byEmail, f.Email)
+		slice := make([]*entities.User, 0)
+		for _, v := range r.byEmail[f.Email] {
+			if v.UUID != uuid {
+				slice = append(slice, v)
+			}
+		}
+		r.byEmail[f.Email] = slice
+
 		delete(r.byUUID, f.UUID)
 		return true
 	}
@@ -56,6 +68,20 @@ func (r *UsersInmemoryRepository) RemoveByUUID(uuid string) bool {
 
 func (r *UsersInmemoryRepository) Remove(d *entities.User) bool {
 	return r.RemoveByUUID(d.UUID)
+}
+
+func (r *UsersInmemoryRepository) Replace(uuid string, d *entities.User) {
+	r.RemoveByUUID(uuid)
+	r.insert(d.Copy())
+}
+
+func (r *UsersInmemoryRepository) Update(uuid string, d *entities.User) {
+	if f := r.FindByUUID(uuid); f != nil {
+		r.RemoveByUUID(uuid)
+		c := d.Copy()
+		c.UUID = f.UUID
+		r.insert(c.Copy())
+	}
 }
 
 func (r *UsersInmemoryRepository) FindByUUID(uuid string) *entities.User {

@@ -27,17 +27,12 @@ func (r *DevicesInmemoryRepository) Create() *entities.Device {
 	return d
 }
 
-func (r *DevicesInmemoryRepository) Insert(d *entities.Device) *entities.Device {
-	c := d.Copy()
-
-	// Repo has own UUID
-	uuid, _ := helpers.GenUUID()
-	c.UUID = uuid
-
+func (r *DevicesInmemoryRepository) insert(c *entities.Device) *entities.Device {
 	if list := r.byEmail[c.OwnerEmail]; list != nil {
 		r.byEmail[c.OwnerEmail] = append(list, c)
 	} else {
-		r.byEmail[c.OwnerEmail] = []*entities.Device{c}
+		list = make([]*entities.Device, 0)
+		r.byEmail[c.OwnerEmail] = append(list, c)
 	}
 
 	r.byUUID[c.UUID] = c
@@ -45,9 +40,26 @@ func (r *DevicesInmemoryRepository) Insert(d *entities.Device) *entities.Device 
 	return c
 }
 
+func (r *DevicesInmemoryRepository) Insert(d *entities.Device) *entities.Device {
+	c := d.Copy()
+
+	// Repo has own UUID
+	uuid, _ := helpers.GenUUID()
+	c.UUID = uuid
+
+	return r.insert(c)
+}
+
 func (r *DevicesInmemoryRepository) RemoveByUUID(uuid string) bool {
 	if f := r.FindByUUID(uuid); f != nil {
-		delete(r.byEmail, f.OwnerEmail)
+		slice := make([]*entities.Device, 0)
+		for _, v := range r.byEmail[f.OwnerEmail] {
+			if v.UUID != uuid {
+				slice = append(slice, v)
+			}
+		}
+		r.byEmail[f.OwnerEmail] = slice
+
 		delete(r.byUUID, f.UUID)
 		return true
 	}
@@ -56,6 +68,20 @@ func (r *DevicesInmemoryRepository) RemoveByUUID(uuid string) bool {
 
 func (r *DevicesInmemoryRepository) Remove(d *entities.Device) bool {
 	return r.RemoveByUUID(d.UUID)
+}
+
+func (r *DevicesInmemoryRepository) Replace(uuid string, d *entities.Device) {
+	r.RemoveByUUID(uuid)
+	r.insert(d.Copy())
+}
+
+func (r *DevicesInmemoryRepository) Update(uuid string, d *entities.Device) {
+	if f := r.FindByUUID(uuid); f != nil {
+		r.RemoveByUUID(uuid)
+		c := d.Copy()
+		c.UUID = f.UUID
+		r.insert(c.Copy())
+	}
 }
 
 func (r *DevicesInmemoryRepository) FindByUUID(uuid string) *entities.Device {
