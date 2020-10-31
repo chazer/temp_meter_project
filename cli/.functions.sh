@@ -1,5 +1,6 @@
 
 json_extract() {
+  set -o pipefail
   echo "$1" |  jq -r -M ."$2"
 }
 
