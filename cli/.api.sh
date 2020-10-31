@@ -1,5 +1,6 @@
 
 api_request() {
+  set -o pipefail
   local method="$1"
   local uri="$2"
   local body="$3"
@@ -8,7 +9,7 @@ api_request() {
       (
         (
           (
-            curl -X "$method" "$uri" -d "$body" -L -v -s \
+            curl -X "$method" "$uri" -d "$body" -L -v -s --fail \
             -D /dev/fd/6 \
             --trace-ascii /dev/fd/3 \
             2>/dev/null | tee /dev/fd/6 >&8
@@ -17,7 +18,7 @@ api_request() {
       ) 7>&1 | sort -k1.1,1.1 -s | sed -e 's/^\(.*\)$/'$'\033[0;90m''\1'$'\033[0m''/' >&9
     ) 8>&1 9>&2
   else
-    curl -X "$method" "$uri" -d "$body" -L -v -s \
+    curl -X "$method" "$uri" -d "$body" -L -v -s --fail \
     2>/dev/null
   fi
 }

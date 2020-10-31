@@ -6,7 +6,7 @@ docker run --rm -ti -v "$(pwd)":/src -w /src koalaman/shellcheck-alpine shellche
   --shell=ash \
   -x \
   -P cli/ \
-  cli/example_case_1.sh || { echo "Error on Shellcheck" >&2; exit 1; }
+  cli/*.sh || { echo "Error on Shellcheck" >&2; exit 1; }
 echo "Shellcheck done" >&2
 
 
@@ -21,7 +21,10 @@ docker-compose -p "$SCOPE" -f docker-compose.yml up -d || { echo "Error on up co
 echo "Up done" >&2
 
 echo "Test API" >&2
-docker-compose -p "$SCOPE" run cli example_case_1.sh || { echo "Test 'example_case_1' failed" >&2; exit 1; }
+for _ in $(seq 10); do
+  docker-compose -p "$SCOPE" run cli example_user_case.sh || { echo "Test 'example_user_case' failed" >&2; exit 1; }
+  docker-compose -p "$SCOPE" run cli example_device_case.sh || { echo "Test 'example_device_case' failed" >&2; exit 1; }
+done
 echo "API test done" >&2
 
 echo "Test containers down" >&2
