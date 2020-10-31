@@ -67,10 +67,16 @@ func (c *DeviceTempController) handlerSaveTempMetrics(resp http.ResponseWriter, 
 	// TODO: extract device uuid by middleware
 	token := req.URL.Query().Get("token")
 	uuid, err := c.auth.GetUUIDFromToken(token)
+
+	debug.Printf("token %s", token)
+	debug.Printf("uuid %s", *uuid)
+
 	if err != nil {
+		debug.Printf("Error: %s", err.Error())
 		resp.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
 	debug.Printf("device (uuid:%s) wants to save data", *uuid)
 	d, err := c.devicesService.GetDeviceById(*uuid)
 	if err != nil {
@@ -89,7 +95,10 @@ func (c *DeviceTempController) handlerSaveTempMetrics(resp http.ResponseWriter, 
 	debug.Printf("got metrics (count=%d)", len(dto))
 
 	for _, record := range dto {
-		c.measurementsService.WriteTemperature(d, record.Time, record.Value)
+		if err := c.measurementsService.WriteTemperature(d.UUID, record.Time, record.Value); err != nil {
+			http.Error(resp, err.Error(), otherErrorsStatusCode)
+			return
+		}
 	}
 
 	resp.WriteHeader(http.StatusCreated)

@@ -30,7 +30,7 @@ func (c *DevicesController) handlerGetLog(resp http.ResponseWriter, req *http.Re
 		return
 	}
 
-	log := c.measurements.GetDeviceLog(d).ToSlice()
+	log := c.measurements.GetDeviceLog(d.UUID).ToSlice()
 
 	var is = make([]interface{}, len(log))
 	for i, d := range log {

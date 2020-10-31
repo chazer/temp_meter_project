@@ -74,12 +74,27 @@ func (c *AuthDevicesController) handlerCreateNewDeviceToken(resp http.ResponseWr
 		return
 	}
 
+	_, err = c.devicesService.GetDeviceById(d.UUID)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	debug.Printf("create token for device (uuid=%s; name=%s)", d.UUID, d.Name)
 
 	token, err := c.auth.IssueTokenForDevice(d)
 	if err != nil {
 		http.Error(resp, err.Error(), http.StatusBadRequest)
 		return
+	}
+
+	rt, err := c.auth.GetUUIDFromToken(*token)
+	if err != nil {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
+	}
+
+	if *rt != d.UUID {
+		http.Error(resp, err.Error(), http.StatusInternalServerError)
 	}
 
 	c.api.WriteEntityDocumentResponse(resp, &c.formatter, *token)

@@ -5,12 +5,14 @@ import (
 	"errors"
 	"strings"
 	devices "tmeter/app/modules/devices/entities"
+	"tmeter/app/modules/devices/services"
 	users "tmeter/app/modules/users/entities"
-	"tmeter/app/modules/users/repositories"
+	usersRepo "tmeter/app/modules/users/repositories"
 )
 
 type authService struct {
-	Users repositories.UsersRepositoryInterface
+	Users   usersRepo.UsersRepositoryInterface
+	devices services.DevicesServiceInterface
 }
 
 // TODO: add token encoder interface
@@ -69,11 +71,18 @@ func (s *authService) GetUUIDFromToken(token string) (*string, error) {
 		return nil, err
 	}
 	uuid := string(sDec)
+	if _, err := s.devices.GetDeviceById(uuid); err != nil {
+		return nil, err
+	}
 	return &uuid, nil
 }
 
-func NewAuthService(users repositories.UsersRepositoryInterface) AuthServiceInterface {
+func NewAuthService(
+	users usersRepo.UsersRepositoryInterface,
+	devices services.DevicesServiceInterface,
+) AuthServiceInterface {
 	return &authService{
 		users,
+		devices,
 	}
 }

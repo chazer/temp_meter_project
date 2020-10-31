@@ -3,15 +3,15 @@ package app
 import (
 	"tmeter/app/api"
 	auth "tmeter/app/modules/auth/services"
-	"tmeter/app/modules/devices/repositories"
-	repositories2 "tmeter/app/modules/measurements/repositories"
+	devicesRepo "tmeter/app/modules/devices/repositories"
+	measureRepo "tmeter/app/modules/measurements/repositories"
 	"tmeter/app/modules/measurements/services"
-	repositories3 "tmeter/app/modules/users/repositories"
+	usersRepo "tmeter/app/modules/users/repositories"
 )
 import devicesServices "tmeter/app/modules/devices/services"
 
 type AppFactoryInterface interface {
-	GetDevicesRepository() repositories.DevicesRepositoryInterface
+	GetDevicesRepository() devicesRepo.DevicesRepositoryInterface
 	GetDevicesService() devicesServices.DevicesServiceInterface
 	GetAPIProtocol() *api.APIProtocol
 	GetAuthService() auth.AuthServiceInterface
@@ -19,7 +19,7 @@ type AppFactoryInterface interface {
 }
 
 type AppFactory struct {
-	devicesRepository   repositories.DevicesRepositoryInterface
+	devicesRepository   devicesRepo.DevicesRepositoryInterface
 	devicesService      *devicesServices.DevicesService
 	apiProtocol         *api.APIProtocol
 	authService         auth.AuthServiceInterface
@@ -42,9 +42,9 @@ func (f *AppFactory) GetDevicesService() devicesServices.DevicesServiceInterface
 	return f.devicesService
 }
 
-func (f *AppFactory) GetDevicesRepository() repositories.DevicesRepositoryInterface {
+func (f *AppFactory) GetDevicesRepository() devicesRepo.DevicesRepositoryInterface {
 	if f.devicesRepository == nil {
-		f.devicesRepository = repositories.MakeDevicesInmemoryRepository()
+		f.devicesRepository = devicesRepo.MakeDevicesInmemoryRepository()
 	}
 	return f.devicesRepository
 }
@@ -59,19 +59,23 @@ func (f *AppFactory) GetAPIProtocol() *api.APIProtocol {
 func (f *AppFactory) GetAuthService() auth.AuthServiceInterface {
 	if f.authService == nil {
 		f.authService = auth.NewAuthService(
-			repositories3.MakeUsersInmemoryRepository(),
+			usersRepo.MakeUsersInmemoryRepository(),
+			f.GetDevicesService(),
 		)
 	}
 	return f.authService
 }
 
-func (f *AppFactory) CreateDeviceLog() repositories2.DeviceLogInterface {
-	return &repositories2.MeasurementsLog{}
+func (f *AppFactory) CreateDeviceLog() measureRepo.DeviceLogInterface {
+	return &measureRepo.MeasurementsLog{}
 }
 
 func (f *AppFactory) GetMeasurementsService() services.MeasurementsServiceInterface {
 	if f.measurementsService == nil {
-		f.measurementsService = services.NewMeasurementsService(f.CreateDeviceLog)
+		f.measurementsService = services.NewMeasurementsService(
+			f.CreateDeviceLog,
+			f.GetDevicesService(),
+		)
 	}
 	return f.measurementsService
 }
