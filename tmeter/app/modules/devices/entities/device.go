@@ -1,17 +1,22 @@
 package entities
 
-import "tmeter/lib/helpers"
+import (
+	"time"
+	"tmeter/lib/helpers"
+)
 
 type Device struct {
 	UUID       string
 	Name       string
 	OwnerEmail string
+	UpdatedAt  time.Time
 }
 
 func MakeDevice() Device {
 	uuid, _ := helpers.GenUUID()
 	return Device{
-		UUID: uuid,
+		UUID:      uuid,
+		UpdatedAt: time.Now(),
 	}
 }
 
@@ -20,5 +25,6 @@ func (d Device) Copy() *Device {
 		UUID:       d.UUID,
 		Name:       d.Name,
 		OwnerEmail: d.OwnerEmail,
+		UpdatedAt:  d.UpdatedAt,
 	}
 }

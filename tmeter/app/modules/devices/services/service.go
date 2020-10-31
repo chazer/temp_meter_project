@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"time"
 	dr "tmeter/app/modules/devices/repositories"
 )
 import "tmeter/app/modules/devices/entities"
@@ -13,6 +14,8 @@ type DevicesServiceInterface interface {
 	GetDeviceById(uuid string) (*entities.Device, error)
 	// TODO: return Cursor
 	GetDevicesByEmail(email string) ([]*entities.Device, error)
+	Touch(uuid string)
+	GetAllDevices() []*entities.Device
 }
 
 type DevicesService struct {
@@ -49,4 +52,16 @@ func (s *DevicesService) GetDeviceById(uuid string) (*entities.Device, error) {
 
 func (s *DevicesService) GetDevicesByEmail(email string) ([]*entities.Device, error) {
 	return s.registry.FindByEmail(email), nil
+}
+
+func (s *DevicesService) Touch(uuid string) {
+	device, _ := s.GetDeviceById(uuid)
+	if device != nil {
+		device.UpdatedAt = time.Now()
+		s.registry.Replace(uuid, device)
+	}
+}
+
+func (s *DevicesService) GetAllDevices() []*entities.Device {
+	return s.registry.Items()
 }

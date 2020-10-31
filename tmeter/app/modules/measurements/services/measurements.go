@@ -27,6 +27,8 @@ func (s *MeasurementsService) WriteTemperature(d *devices.Device, time int64, va
 		Time:        time,
 		Temperature: &value,
 	})
+	s.devices.Touch(uuid)
+	return nil
 }
 
 func (s *MeasurementsService) GetDeviceLog(d *devices.Device) repositories.DeviceLogInterface {
