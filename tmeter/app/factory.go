@@ -7,6 +7,7 @@ import (
 	measureRepo "tmeter/app/modules/measurements/repositories"
 	"tmeter/app/modules/measurements/services"
 	usersRepo "tmeter/app/modules/users/repositories"
+	"tmeter/lib/tokens"
 )
 import devicesServices "tmeter/app/modules/devices/services"
 
@@ -24,6 +25,7 @@ type AppFactory struct {
 	apiProtocol         *api.APIProtocol
 	authService         auth.AuthServiceInterface
 	measurementsService services.MeasurementsServiceInterface
+	tokenEncoder        tokens.TokenEncoderInterface
 }
 
 func NewAppFactory() *AppFactory {
@@ -61,6 +63,7 @@ func (f *AppFactory) GetAuthService() auth.AuthServiceInterface {
 		f.authService = auth.NewAuthService(
 			usersRepo.MakeUsersInmemoryRepository(),
 			f.GetDevicesService(),
+			f.GetTokenEncoder(),
 		)
 	}
 	return f.authService
@@ -78,4 +81,11 @@ func (f *AppFactory) GetMeasurementsService() services.MeasurementsServiceInterf
 		)
 	}
 	return f.measurementsService
+}
+
+func (f *AppFactory) GetTokenEncoder() tokens.TokenEncoderInterface {
+	if f.tokenEncoder == nil {
+		f.tokenEncoder = tokens.NewBase64TokenEncoder()
+	}
+	return f.tokenEncoder
 }

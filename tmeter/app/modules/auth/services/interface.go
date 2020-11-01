@@ -6,8 +6,6 @@ import (
 )
 
 type AuthServiceInterface interface {
-	encodeToken(email string) (*string, error)
-	decodeToken(token string) (*string, error)
 	IssueTokenForUser(user *users.User) (*string, error)
 	IssueTokenForDevice(device *devices.Device) (*string, error)
 	GetEmailFromToken(token string) (*string, error)

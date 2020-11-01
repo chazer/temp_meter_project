@@ -21,10 +21,12 @@ docker-compose -p "$SCOPE" -f docker-compose.yml up -d || { echo "Error on up co
 echo "Up done" >&2
 
 echo "Test API" >&2
-for _ in $(seq 10); do
-  docker-compose -p "$SCOPE" run cli example_user_case.sh || { echo "Test 'example_user_case' failed" >&2; exit 1; }
-  docker-compose -p "$SCOPE" run cli example_device_case.sh || { echo "Test 'example_device_case' failed" >&2; exit 1; }
-done
+docker-compose -p "$SCOPE" run cli sh -c \
+  "for _ in \$(seq 20); do example_device_case.sh || exit 1; done" \
+  || { echo "Test 'example_device_case' failed" >&2; exit 1; }
+docker-compose -p "$SCOPE" run cli sh -c \
+  "for _ in \$(seq 5); do example_user_case.sh || exit 1; done" \
+  || { echo "Test 'example_user_case' failed" >&2; exit 1; }
 echo "API test done" >&2
 
 echo "Test containers down" >&2
