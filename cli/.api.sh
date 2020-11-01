@@ -44,23 +44,23 @@ api_get_device_token() {
 api_get_device() {
   local uuid="$1"
   local token="$2"
-  api_request GET "${API_URI}/devices/byId?id=${uuid}&token=${token}"
+  api_request GET "${API_URI}/devices/byId?id=$(uriencode "$uuid" )&token=$(uriencode "$token" )"
 }
 
 api_get_device_log() {
   local uuid="$1"
   local token="$2"
-  api_request GET "${API_URI}/devices/byId/log?id=${uuid}&token=${token}"
+  api_request GET "${API_URI}/devices/byId/log?id=$(uriencode "$uuid" )&token=$(uriencode "$token" )"
 }
 
 api_get_my_devices() {
   local token="$1"
-  api_request GET "${API_URI}/devices/?token=${token}"
+  api_request GET "${API_URI}/devices/?token=$(uriencode "$token" )"
 }
 
 api_device_save_measurement() {
   local token="$1"
   local value="$2"
   local time_ms="$(time_ms)"
-  api_request POST "${API_URI}/measurements/temp?token=${token}" '[{"time":'"${time_ms}"', "value":'"${value}"'}]'
+  api_request POST "${API_URI}/measurements/temp?token=$(uriencode "$token" )" '[{"time":'"${time_ms}"', "value":'"${value}"'}]'
 }

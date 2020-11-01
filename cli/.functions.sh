@@ -34,3 +34,7 @@ random_float_in_range() {
   local b="$2"
   echo "$(( a + RANDOM % ( b - a ) )).$(( RANDOM % 999 ))"
 }
+
+function uriencode {
+  jq -nr --arg v "$1" '$v|@uri'
+}
