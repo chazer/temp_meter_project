@@ -2,22 +2,20 @@ package controllers
 
 import (
 	"net/http"
-	"tmeter/app/modules/devices/services"
-	"tmeter/lib/debug"
 )
 
-func (c *DevicesController) handlerGetOneDevice(writer http.ResponseWriter, request *http.Request) {
-	id := request.URL.Query().Get("id")
-	debug.Printf("get device (uuid=%s)", id)
+func (c *DevicesController) handlerGetOneDevice(writer http.ResponseWriter, req *http.Request) {
+	uuid := req.URL.Query().Get("id")
+	token := req.Header.Get("Authorization")
 
-	d, err := c.devicesService.GetDeviceById(id)
-	if err != nil && err.Error() == services.ErrNoDevice {
-		writer.WriteHeader(404)
+	d, status := c.getDeviceAndVerify(uuid, token)
+	if status > 0 {
+		writer.WriteHeader(status)
+		return
 	}
-	if d != nil {
-		debug.Printf("found: (uuid=%s; email=%s)", d.UUID, d.OwnerEmail)
-		c.sendItem(writer, d)
 
+	if d != nil {
+		c.sendItem(writer, d)
 		writer.WriteHeader(201)
 	} else {
 		writer.WriteHeader(500)

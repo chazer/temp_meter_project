@@ -29,7 +29,8 @@ $ curl http://${SERVER_ADDR}/auth/device/token \
 Get all devices, associated with current authenticated user.
 
 ```bash
-$ curl "http://${SERVER_ADDR}/devices/?token=${USER_TOKEN}"
+$ curl "http://${SERVER_ADDR}/devices/"
+-H "Authorization: ${USER_TOKEN}"
 
 {
   "items": [
@@ -51,7 +52,8 @@ $ curl "http://${SERVER_ADDR}/devices/?token=${USER_TOKEN}"
 Get device details.
 
 ```bash
-$ curl "http://${SERVER_ADDR}/devices/byId?token=${USER_TOKEN}&id=${DEVICE_UUID}"
+$ curl "http://${SERVER_ADDR}/devices/byId?id=${DEVICE_UUID}" \
+-H "Authorization: ${USER_TOKEN}"
 
 {
   "device": {
@@ -65,7 +67,8 @@ $ curl "http://${SERVER_ADDR}/devices/byId?token=${USER_TOKEN}&id=${DEVICE_UUID}
 Get device temperature log.
 
 ```bash
-$ curl "http://${SERVER_ADDR}/devices/byId/log?token=${USER_TOKEN}&id=${DEVICE_UUID}"
+$ curl "http://${SERVER_ADDR}/devices/byId/log?id=${DEVICE_UUID}" \
+-H "Authorization: ${USER_TOKEN}"
 
 {
   "items": [
@@ -90,6 +93,7 @@ $ curl "http://${SERVER_ADDR}/devices/byId/log?token=${USER_TOKEN}&id=${DEVICE_U
 Save temperature measurements for an authorized device.
 
 ```bash
-$ curl http://${SERVER_ADDR}/measurements/temp?token=${DEVICE_TOKEN}" \
+$ curl http://${SERVER_ADDR}/measurements/temp" \
+-H "Authorization: ${DEVICE_TOKEN}" \
 -X POST -d '[{"time":1604234663141, "value":12.34}]'
 ```

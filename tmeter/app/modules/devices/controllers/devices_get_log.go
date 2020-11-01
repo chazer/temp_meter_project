@@ -2,31 +2,41 @@ package controllers
 
 import (
 	"net/http"
+	"tmeter/app/modules/devices/entities"
 	"tmeter/lib/debug"
 )
 
-func (c *DevicesController) handlerGetLog(resp http.ResponseWriter, req *http.Request) {
-	uuid := req.URL.Query().Get("id")
-	token := req.URL.Query().Get("token")
-
+func (c *DevicesController) getDeviceAndVerify(uuid string, token string) (*entities.Device, int) {
 	email, err := c.auth.GetEmailFromToken(token)
 	if err != nil {
-		resp.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil, http.StatusUnauthorized
 	}
 
-	debug.Printf("user (email:%s) wants get device (uuid:%s)", email, uuid)
+	debug.Printf("user (email:%s) wants get device (uuid:%s)", *email, uuid)
 
 	d, err := c.devicesService.GetDeviceById(uuid)
 	if err != nil {
 		debug.Printf("device (uuid:%s) is not found", uuid)
-		resp.WriteHeader(http.StatusNotFound)
-		return
+		return d, http.StatusNotFound
 	}
+
+	debug.Printf("found device (uuid:%d)", uuid)
 
 	if d.OwnerEmail != *email {
 		debug.Printf("user (email:%s) is not owner of device (uuid:%s)", *email, uuid)
-		resp.WriteHeader(http.StatusForbidden)
+		return d, http.StatusForbidden
+	}
+
+	return d, 0
+}
+
+func (c *DevicesController) handlerGetLog(resp http.ResponseWriter, req *http.Request) {
+	uuid := req.URL.Query().Get("id")
+	token := req.Header.Get("Authorization")
+
+	d, status := c.getDeviceAndVerify(uuid, token)
+	if status > 0 {
+		resp.WriteHeader(status)
 		return
 	}
 

@@ -7,7 +7,7 @@ import (
 )
 
 func (c *DevicesController) handlerGetMyDevices(writer http.ResponseWriter, request *http.Request) {
-	token := request.URL.Query().Get("token")
+	token := request.Header.Get("Authorization")
 	debug.Printf("token: %s", token)
 
 	// TODO: extract user by middleware

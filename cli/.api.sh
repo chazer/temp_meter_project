@@ -1,15 +1,23 @@
 
+# Make HTTP request
+# $1 method: POST|GET
+# $2 URI
+# $3 BODY - only for methods: POST
+# $* pass arguments
 api_request() {
   set -o pipefail
-  local method="$1"
-  local uri="$2"
-  local body="$3"
+  local method="$1"; shift
+  local uri="$1"; shift
+  local body
+  if [ "$method" == "POST" ]; then
+    body="$1"; shift
+  fi
   if $DEBUG; then
     (
       (
         (
           (
-            curl -X "$method" "$uri" -d "$body" -L -v -s --fail \
+            curl -X "$method" "$uri" -d "$body" -L -v -s --fail "$@" \
             -D /dev/fd/6 \
             --trace-ascii /dev/fd/3 \
             2>/dev/null | tee /dev/fd/6 >&8
@@ -18,7 +26,7 @@ api_request() {
       ) 7>&1 | sort -k1.1,1.1 -s | sed -e 's/^\(.*\)$/'$'\033[0;90m''\1'$'\033[0m''/' >&9
     ) 8>&1 9>&2
   else
-    curl -X "$method" "$uri" -d "$body" -L -v -s --fail \
+    curl -X "$method" "$uri" -d "$body" -L -v -s --fail "$@" \
     2>/dev/null
   fi
 }
@@ -44,23 +52,27 @@ api_get_device_token() {
 api_get_device() {
   local uuid="$1"
   local token="$2"
-  api_request GET "${API_URI}/devices/byId?id=$(uriencode "$uuid" )&token=$(uriencode "$token" )"
+  api_request GET "${API_URI}/devices/byId?id=$(uriencode "$uuid" )" \
+    -H "Authorization: ${token}"
 }
 
 api_get_device_log() {
   local uuid="$1"
   local token="$2"
-  api_request GET "${API_URI}/devices/byId/log?id=$(uriencode "$uuid" )&token=$(uriencode "$token" )"
+  api_request GET "${API_URI}/devices/byId/log?id=$(uriencode "$uuid" )" \
+    -H "Authorization: ${token}"
 }
 
 api_get_my_devices() {
   local token="$1"
-  api_request GET "${API_URI}/devices/?token=$(uriencode "$token" )"
+  api_request GET "${API_URI}/devices/" \
+    -H "Authorization: ${token}"
 }
 
 api_device_save_measurement() {
   local token="$1"
   local value="$2"
   local time_ms="$(time_ms)"
-  api_request POST "${API_URI}/measurements/temp?token=$(uriencode "$token" )" '[{"time":'"${time_ms}"', "value":'"${value}"'}]'
+  api_request POST "${API_URI}/measurements/temp" '[{"time":'"${time_ms}"', "value":'"${value}"'}]' \
+    -H "Authorization: ${token}"
 }

@@ -65,7 +65,7 @@ type tokenSaveMetricsDTO = []tempMetricPoint
 
 func (c *DeviceTempController) handlerSaveTempMetrics(resp http.ResponseWriter, req *http.Request) {
 	// TODO: extract device uuid by middleware
-	token := req.URL.Query().Get("token")
+	token := req.Header.Get("Authorization")
 	uuid, err := c.auth.GetUUIDFromToken(token)
 
 	debug.Printf("token %s", token)
