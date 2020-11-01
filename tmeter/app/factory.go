@@ -2,14 +2,18 @@ package app
 
 import (
 	"tmeter/app/api"
+	"tmeter/app/consts"
 	auth "tmeter/app/modules/auth/services"
 	devicesRepo "tmeter/app/modules/devices/repositories"
 	measureRepo "tmeter/app/modules/measurements/repositories"
 	"tmeter/app/modules/measurements/services"
 	usersRepo "tmeter/app/modules/users/repositories"
+	"tmeter/lib/env"
 	"tmeter/lib/tokens"
 )
 import devicesServices "tmeter/app/modules/devices/services"
+
+const defaultSecret = "25875e67-dec9-4cfe-b399-84105ab17ba1"
 
 type AppFactoryInterface interface {
 	GetDevicesRepository() devicesRepo.DevicesRepositoryInterface
@@ -85,7 +89,8 @@ func (f *AppFactory) GetMeasurementsService() services.MeasurementsServiceInterf
 
 func (f *AppFactory) GetTokenEncoder() tokens.TokenEncoderInterface {
 	if f.tokenEncoder == nil {
-		f.tokenEncoder = tokens.NewBase64TokenEncoder()
+		//f.tokenEncoder = tokens.NewBase64TokenEncoder()
+		f.tokenEncoder = tokens.NewAesTokenEncoder(env.GetEnvOrDefault(consts.EnvKeySecret, defaultSecret))
 	}
 	return f.tokenEncoder
 }

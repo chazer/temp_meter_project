@@ -7,11 +7,11 @@ import (
 
 type base64Encoder struct{}
 
-func (s *base64Encoder) EncodeToken(email string) (*string, error) {
-	if email == "" {
+func (s *base64Encoder) EncodeToken(text string) (*string, error) {
+	if text == "" {
 		return nil, errors.New("email is empty")
 	}
-	str := base64.StdEncoding.EncodeToString([]byte(email))
+	str := base64.StdEncoding.EncodeToString([]byte(text))
 	return &str, nil
 }
 
